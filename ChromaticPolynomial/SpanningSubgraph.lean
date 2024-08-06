@@ -137,7 +137,7 @@ def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgr
 
 namespace Finite
 
-variable [Fintype V] [DecidableEq V] [DecidableRel G.Adj] [DecidablePred (· ∈ 𝒫 G.edgeSet)]
+variable [Fintype V] [DecidablePred (· ∈ 𝒫 G.edgeSet)]
 
 instance : Fintype G.SpanningSubgraph :=
     Fintype.ofBijective G.spanningSubgraph_fromEdgeSet G.spanningSubgraphs_bijection_Powerset_EdgeSet
