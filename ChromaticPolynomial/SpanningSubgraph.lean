@@ -135,4 +135,13 @@ def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgr
     change (fromEdgeSet F).edgeSet = (H : G.Subgraph).edgeSet
     rw [edgeSet_fromEdgeSet, ← powerset_edgeSet_eq_diff_setOf_not_isDiag]
 
+namespace Finite
+
+variable [Fintype V] [DecidableEq V] [DecidableRel G.Adj] [DecidablePred (· ∈ 𝒫 G.edgeSet)]
+
+instance : Fintype G.SpanningSubgraph :=
+    Fintype.ofBijective G.spanningSubgraph_fromEdgeSet G.spanningSubgraphs_bijection_Powerset_EdgeSet
+
+end Finite
+
 end SimpleGraph
