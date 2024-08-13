@@ -88,33 +88,6 @@ end FromPowerset
 
 open Function
 
-theorem spanningSubgraphs_bijection_Powerset_EdgeSet :
-    Bijective G.spanningSubgraph_fromEdgeSet := by
-  constructor
-  · intro F₁ F₂ h
-    let H₁ := (G.spanningSubgraph_fromEdgeSet F₁)
-    let H₂ := (G.spanningSubgraph_fromEdgeSet F₂)
-    have h₁ : (H₁ : G.Subgraph).Adj = (H₂ : G.Subgraph).Adj := by
-      exact congrArg Subgraph.Adj (congrArg Subtype.val h)
-    let G₁ := fromEdgeSet (F₁ : Set (Sym2 V))
-    let G₂ := fromEdgeSet (F₂ : Set (Sym2 V))
-    have h₂ : G₁ = G₂ := by
-      exact adj_inj.mp h₁
-    rw [← edgeSet_inj] at h₂
-    rw [edgeSet_fromEdgeSet, edgeSet_fromEdgeSet] at h₂
-    repeat
-      rw [← powerset_edgeSet_eq_diff_setOf_not_isDiag] at h₂
-    exact SetCoe.ext h₂
-  · intro H
-    let ⟨H, Hspanning⟩ := H
-    let F : 𝒫 G.edgeSet := ⟨H.edgeSet, Subgraph.edgeSet_subset H⟩
-    use F
-    rw [SpanningSubgraph.edgeSet_inj]
-    simp
-    change (fromEdgeSet F).edgeSet = (F : Set (Sym2 V))
-    rw [edgeSet_fromEdgeSet]
-    rw [← powerset_edgeSet_eq_diff_setOf_not_isDiag]
-
 def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgraph where
   toFun := G.spanningSubgraph_fromEdgeSet
   invFun H := ⟨(H : G.Subgraph).edgeSet, Subgraph.edgeSet_subset (H : G.Subgraph)⟩
@@ -140,7 +113,7 @@ namespace Finite
 variable [Fintype V] [DecidablePred (· ∈ 𝒫 G.edgeSet)]
 
 instance : Fintype G.SpanningSubgraph :=
-    Fintype.ofBijective G.spanningSubgraph_fromEdgeSet G.spanningSubgraphs_bijection_Powerset_EdgeSet
+  Fintype.ofBijective G.powerset_edgeSet_equiv_SpanningSubgraph G.powerset_edgeSet_equiv_SpanningSubgraph.bijective
 
 end Finite
 
