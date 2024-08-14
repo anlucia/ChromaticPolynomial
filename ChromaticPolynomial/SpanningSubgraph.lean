@@ -1,4 +1,5 @@
 import Mathlib.Combinatorics.SimpleGraph.Subgraph
+import Mathlib.Logic.Function.Basic
 
 /-!
 # Spanning subgraphs of a simple graph
@@ -26,23 +27,27 @@ lemma edgeSet_eq_edgeSet_diff_setOf_isDiag : G.edgeSet = G.edgeSet \ { e | e.IsD
 
 namespace SpanningSubgraph
 
+def edgeSet (H : G.SpanningSubgraph) := (H : G.Subgraph).edgeSet
+
 /- Two spanning subgraphs of G are equal iff their edgeset are equal -/
+lemma edgeSet_injective :
+  Function.Injective fun (H : G.SpanningSubgraph) => H.edgeSet := by
+    intro H₁ H₂ edgeseteq
+    let ⟨G₁, G₁spanning⟩ := H₁
+    let ⟨G₂, G₂spanning⟩ := H₂
+    apply Subtype.eq
+    change G₁ = G₂
+    change G₁.edgeSet = G₂.edgeSet at edgeseteq
+    rw [Subgraph.ext_iff]
+    constructor
+    exact Set.Subset.antisymm (fun ⦃a⦄ _ ↦ G₂spanning a) fun ⦃a⦄ _ ↦ G₁spanning a
+    rw [← Subgraph.spanningCoe_inj, ← SimpleGraph.edgeSet_inj]
+    exact edgeseteq
+
+@[simp]
 lemma edgeSet_inj (H₁ H₂ : G.SpanningSubgraph) :
-  H₁ = H₂ ↔ (H₁ : G.Subgraph).edgeSet = (H₂ : G.Subgraph).edgeSet := by
-  constructor
-  intro hequal
-  exact congrArg Subgraph.edgeSet (congrArg Subtype.val hequal)
-  intro edgeseteq
-  let ⟨G₁, G₁spanning⟩ := H₁
-  let ⟨G₂, G₂spanning⟩ := H₂
-  apply Subtype.eq
-  change G₁ = G₂
-  change G₁.edgeSet = G₂.edgeSet at edgeseteq
-  rw [Subgraph.ext_iff]
-  constructor
-  exact Set.Subset.antisymm (fun ⦃a⦄ _ ↦ G₂spanning a) fun ⦃a⦄ _ ↦ G₁spanning a
-  rw [← Subgraph.spanningCoe_inj, ← SimpleGraph.edgeSet_inj]
-  exact edgeseteq
+  H₁.edgeSet = H₂.edgeSet ↔ H₁ = H₂ :=
+  Function.Injective.eq_iff (SpanningSubgraph.edgeSet_injective G)
 
 end SpanningSubgraph
 
@@ -90,7 +95,7 @@ open Function
 
 def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgraph where
   toFun := G.spanningSubgraph_fromEdgeSet
-  invFun H := ⟨(H : G.Subgraph).edgeSet, Subgraph.edgeSet_subset (H : G.Subgraph)⟩
+  invFun H := ⟨H.edgeSet, Subgraph.edgeSet_subset (H : G.Subgraph)⟩
   left_inv F := by
     let H := G.spanningSubgraph_fromEdgeSet F
     let H' := fromEdgeSet (F : Set (Sym2 V))
@@ -104,7 +109,7 @@ def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgr
       ⟨(H : G.Subgraph).edgeSet, Subgraph.edgeSet_subset (H : G.Subgraph)⟩
     simp
     change G.spanningSubgraph_fromEdgeSet F = H
-    rw [SpanningSubgraph.edgeSet_inj]
+    rw [← SpanningSubgraph.edgeSet_inj]
     change (fromEdgeSet F).edgeSet = (H : G.Subgraph).edgeSet
     rw [edgeSet_fromEdgeSet, ← powerset_edgeSet_eq_diff_setOf_isDiag]
 
