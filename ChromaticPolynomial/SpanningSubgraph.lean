@@ -13,7 +13,7 @@ variable {V : Type u} (G : SimpleGraph V)
 abbrev SpanningSubgraph (G : SimpleGraph V) :=
   {H : G.Subgraph // H.IsSpanning}
 
-lemma edgeSet_eq_edgeSet_diff_setOf_not_isDiag : G.edgeSet = G.edgeSet \ { e | e.IsDiag } := by
+lemma edgeSet_eq_edgeSet_diff_setOf_isDiag : G.edgeSet = G.edgeSet \ { e | e.IsDiag } := by
   apply Set.Subset.antisymm
   · rw [Set.subset_def]
     rintro x hx
@@ -50,10 +50,10 @@ section FromPowerset
 
 variable (F : 𝒫 G.edgeSet)
 
-lemma powerset_edgeSet_eq_diff_setOf_not_isDiag : (F : Set (Sym2 V)) = ↑F \ {e | e.IsDiag} := by
+lemma powerset_edgeSet_eq_diff_setOf_isDiag : (F : Set (Sym2 V)) = ↑F \ {e | e.IsDiag} := by
   let ⟨F', hFsubset⟩ := F
   apply Set.subset_of_mem_powerset at hFsubset
-  rw [edgeSet_eq_edgeSet_diff_setOf_not_isDiag] at hFsubset
+  rw [edgeSet_eq_edgeSet_diff_setOf_isDiag] at hFsubset
   rw [Set.subset_diff] at hFsubset
   rcases hFsubset with ⟨_, hFnondiag⟩
   exact Eq.symm (Disjoint.sdiff_eq_right (id (Disjoint.symm hFnondiag)))
@@ -63,7 +63,7 @@ lemma fromEdgeSet_Subgraph : fromEdgeSet F ≤ G := by
   apply Set.subset_of_mem_powerset at hFsubset
   rw [← edgeSet_subset_edgeSet]
   rw [edgeSet_fromEdgeSet]
-  rw [← powerset_edgeSet_eq_diff_setOf_not_isDiag]
+  rw [← powerset_edgeSet_eq_diff_setOf_isDiag]
   exact hFsubset
 
 def spanningSubgraph_fromEdgeSet' : G.Subgraph where
@@ -98,7 +98,7 @@ def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgr
     change ⟨H'.edgeSet, h⟩ = F
     apply Subtype.eq
     simp
-    rw [edgeSet_fromEdgeSet, ← powerset_edgeSet_eq_diff_setOf_not_isDiag]
+    rw [edgeSet_fromEdgeSet, ← powerset_edgeSet_eq_diff_setOf_isDiag]
   right_inv H := by
     let F : 𝒫 G.edgeSet :=
       ⟨(H : G.Subgraph).edgeSet, Subgraph.edgeSet_subset (H : G.Subgraph)⟩
@@ -106,7 +106,7 @@ def powerset_edgeSet_equiv_SpanningSubgraph : 𝒫 G.edgeSet ≃ G.SpanningSubgr
     change G.spanningSubgraph_fromEdgeSet F = H
     rw [SpanningSubgraph.edgeSet_inj]
     change (fromEdgeSet F).edgeSet = (H : G.Subgraph).edgeSet
-    rw [edgeSet_fromEdgeSet, ← powerset_edgeSet_eq_diff_setOf_not_isDiag]
+    rw [edgeSet_fromEdgeSet, ← powerset_edgeSet_eq_diff_setOf_isDiag]
 
 namespace Finite
 
