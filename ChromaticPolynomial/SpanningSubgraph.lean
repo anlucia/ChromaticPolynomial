@@ -28,6 +28,7 @@ lemma edgeSet_eq_edgeSet_diff_setOf_isDiag : G.edgeSet = G.edgeSet \ { e | e.IsD
 namespace SpanningSubgraph
 
 def edgeSet (H : G.SpanningSubgraph) := (H : G.Subgraph).edgeSet
+def coe (H : G.SpanningSubgraph) := (H : G.Subgraph).spanningCoe
 
 /- Two spanning subgraphs of G are equal iff their edgeset are equal -/
 lemma edgeSet_injective :
