@@ -1,4 +1,6 @@
 import «ChromaticPolynomial».SpanningSubgraph
+import «ChromaticPolynomial».ConstantOnConnectedComponents
+
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.WalkCounting
 import Mathlib.Combinatorics.SimpleGraph.Coloring
 import Mathlib.Algebra.Polynomial.Eval
@@ -141,16 +143,6 @@ lemma indicator_proper_eq_one_iff_proper (π : V → α) :
       subst hsw
       exact h he
 
-variable (H : G.Subgraph) (π : {π : V → α // ∀ {v w : V}, H.Adj v w → π v = π w })
-#check ConnectedComponent.lift π.val ?h
-
-def equiv_constant_on_cc (H : G.Subgraph) :
-  {π : V → α // ∀ {v w : V}, H.Adj v w → π v = π w } ≃ (H.coe.ConnectedComponent → α) := where
-  toFun π := Quot.lift_mk π.val
-  invFun P :=
-  left_inv := sorry
-  right_inv := sorry
-
 open Finset
 
 lemma indicator_constant_connected_components (F :  {F // F ⊆ G.edgeSet}) : ∑ (π : V → α), ∏ (e ∈ F.val), (indicator_constant R α π e) =
@@ -206,7 +198,14 @@ lemma indicator_constant_connected_components (F :  {F // F ⊆ G.edgeSet}) : �
       _ = Fintype.card (H.coe.ConnectedComponent → α) := by
           apply Nat.cast_inj.mpr
           apply Fintype.card_congr
-          apply equiv_constant_on_cc
+          symm
+          apply Equiv.trans (Equiv.symm (H.coe).equiv_constant_on_cc)
+          apply Equiv.subtypeEquiv (Equiv.arrowCongr (Equiv.Set.univ V) (Equiv.refl α))
+          intro _
+          constructor
+          repeat'
+          intro h _ _ hadj
+          exact h hadj
       _ = (↑(Fintype.card α))^(G.edge_subset_ConnectedComponent_card F) := by
           simp
           exact rfl
